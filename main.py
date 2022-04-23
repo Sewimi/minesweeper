@@ -26,32 +26,46 @@ def initialize_board(size):
     for i in range(len(board)): 
         surrounding_cells=get_surrounding_cells(board,size,i)
 
-        for cell in surrounding_cells:
-            pass
+
+        
+        if board[i].is_mine == False:
+            count=0
+           
+            for cell in surrounding_cells:
+                if cell.is_mine == True:
+                    count+=1
+            board[i].content=count
+        else:
+            board[i].content="*"
+                    
+            
+
 
 
     
     return board
         
 
-def get_surrounding_cells(board,size,index):
+def get_surrounding_cells(board,size,ind):
     surrounding_cells=[]
     
-    if index in range(0,len(board)-size):
-        surrounding_cells.append(board[index+size])
+    if ind in range(0,len(board)-size):
+        surrounding_cells.append(board[ind+size])
                     
 
-    if index in range(size,len(board)):
-        surrounding_cells.append([index-size])
+    if ind in range(size,len(board)):
+        surrounding_cells.append(board[ind-size])
                     
             
-    if index in range(1,len(board)):
-        surrounding_cells.append(board[index-1])
+    if ind in range(1,len(board)):
+        surrounding_cells.append(board[ind-1])
                     
 
-    if index in range(0,len(board)-1):                         
-        surrounding_cells.append(board[index+1])
+    if ind in range(0,len(board)-1):                         
+        surrounding_cells.append(board[ind+1])
+    
 
+ 
     return surrounding_cells
                 
                         
@@ -119,23 +133,4 @@ def game_loop(board,size):
 
 
 start_Game()
- # for i,field in enumerate(board):
-    #     count=0
-    #     if field.is_mine==False:
-    #         if i in range(0,len(board)-size):
-    #             if board[i+size].is_mine==True:
-    #                 count+=1
-
-    #         if i in range(size,len(board)):
-    #             if board[i-size].is_mine==True:
-    #                 count+=1
-            
-    #         if i in range(1,len(board)):
-    #             if board[i-1].is_mine==True:
-    #                 count+=1
-
-    #         if i in range(0,len(board)-1):                         
-    #             if board[i+1].is_mine==True:
-    #                     count+=1
-
-    #         field.content=count
+ 
