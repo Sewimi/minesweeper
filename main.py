@@ -1,7 +1,20 @@
 from ast import While
 import keyboard 
 import time
-from Field import Field
+import Field
+import Display
+# import pygame
+
+# pygame.init()
+
+console_mode = True
+
+
+# background_colour = (255,255,255)
+# (width, height) = (300, 200)
+# screen = pygame.display.set_mode((width, height))
+
+
 
 
 size=0
@@ -20,11 +33,11 @@ def initialize_board(size):
     board=[]
     for i in range(size):
         for j in range(size):
-            board.append(Field([i,j]))
+            board.append(Field.Field((i*size)+j))
 
 
     for i in range(len(board)): 
-        surrounding_cells=get_surrounding_cells(board,size,i)
+        surrounding_cells=Field.get_surrounding_cells(board,size,i)
 
 
         
@@ -34,7 +47,7 @@ def initialize_board(size):
             for cell in surrounding_cells:
                 if cell.is_mine == True:
                     count+=1
-            board[i].content=count
+            board[i].content=f"{count}"
         else:
             board[i].content="*"
                     
@@ -46,29 +59,6 @@ def initialize_board(size):
     return board
         
 
-def get_surrounding_cells(board,size,ind):
-    surrounding_cells=[]
-    
-    if ind in range(0,len(board)-size):
-        surrounding_cells.append(board[ind+size])
-                    
-
-    if ind in range(size,len(board)):
-        surrounding_cells.append(board[ind-size])
-                    
-            
-    if ind in range(1,len(board)):
-        surrounding_cells.append(board[ind-1])
-                    
-
-    if ind in range(0,len(board)-1):                         
-        surrounding_cells.append(board[ind+1])
-    
-
- 
-    return surrounding_cells
-                
-                        
    
 
 
@@ -78,7 +68,9 @@ def print_board(board,size):
         
         if i%size==0:
             print("\n")
-            print("----------")
+            for i in range(size):
+                print("--",end="")
+            print("")
         if field.revealed == True:
             print(f"{field.content}|",end="")
         else:
@@ -103,30 +95,71 @@ def get_player_input(size):
 
     }
 
-def check_win():
-    pass
+def check_win_lose(board,size):
+    for field in board:
+
+        #Checking if game is lost
+        if field.revealed == True and field.is_mine == True:
+            print_board(board,size)
+            print("You Have Lost")
+            return True
+
+        #Cheking if game has been won
+        
 
 
 def game_loop(board,size):
-    while True:
-        #don't spam game loop million times a sec
-        time.sleep(1)
-    
+    if console_mode:
+        while True:
+            #don't spam game loop million times a sec
+            time.sleep(0.1)
         
-        #quitting game
-        try:  
-            if keyboard.is_pressed('q'):  
-                print('You have exited the game')
-                break
-        except:
-            print("an Error Occured")
+            
+            #quitting game
+            try:  
+                if keyboard.is_pressed('q'):  
+                    print('You have exited the game')
+                    break
+            except:
+                print("an Error Occured")
 
 
-        #
-        print_board(board,size)
-        action=get_player_input(size)
-        board[size*action["row"]+action["column"]].update_content(action["action"])
-        check_win()
+            print_board(board,size)
+            action=get_player_input(size)
+
+
+            board[size*action["row"]+action["column"]].update_content(action["action"],board)
+
+            if(check_win_lose(board,size)):
+                restart=input("Do you want to restart the game? (y/n): ")
+                if restart == "y":
+                    start_Game()
+                else:
+                    print("Goodbye!")
+                    break
+    else:
+        while True:
+            #don't spam game loop million times a sec
+            time.sleep(0.1)
+            pygame.display.flip()
+        
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    break
+
+
+            action=get_player_input(size)
+
+
+            board[size*action["row"]+action["column"]].update_content(action["action"],board)
+
+            if(check_win_lose(board,size)):
+                restart=input("Do you want to restart the game? (y/n): ")
+                if restart == "y":
+                    start_Game()
+                else:
+                    print("Goodbye!")
+                    break
 
 
         
