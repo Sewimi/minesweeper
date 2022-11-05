@@ -15,7 +15,15 @@ def game():
     print("Have fun!")
     
     while True:
+
         
+        
+        action=input("reveal(r) or mark(m)?: ")
+        if action == "exit":
+            break
+        if action=="win":
+            board.xd()
+            lost=0
 
         row=input("enter row: ")
         if row == "exit":
@@ -29,11 +37,22 @@ def game():
         row=int(row)
         col=int(col)
 
-        lost=board.board[row][col].reveal()
+        if action=="r":
+            lost=board.board[row][col].reveal()
+        elif action=="m":
+            lost=board.board[row][col].mark()
+
+
         if lost == -1:
             print("\nYou lost!\n")
             print(board)
             break
+
+        if board.check_win():
+            print("You've won the game!")
+            print(board)
+            break
+
 
 
         board.print_board()
@@ -41,6 +60,7 @@ def game():
     x=input("play again?(y/n):")
     if x == "y":
         game()
+
 
 
 game()

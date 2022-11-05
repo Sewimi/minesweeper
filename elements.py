@@ -8,6 +8,7 @@ class Field:
         self.pos_x=pos_x
         self.pos_y=pos_y
         self.board=board
+        self.marked=False
         self.neighbours=self.find_neighbours()
 
     def find_neighbours(self):
@@ -38,6 +39,10 @@ class Field:
 
 
     def reveal(self):
+        if self.marked==True:
+            print("This position is marked!'")
+            return
+
         if self.value == "*":
             return -1
         self.hidden=False
@@ -45,15 +50,19 @@ class Field:
             neighbour=self.board.board[row][col]
             if neighbour.hidden == True and neighbour.value == "0":
                 neighbour.reveal()
-            elif neighbour.value != "*" and neighbour.hidden == True:
+            elif neighbour.value != "*" and neighbour.hidden == True and neighbour.marked == False:
                 neighbour.hidden=False
 
-   
+    def mark(self):
+        if self.marked==True:
+            self.marked=False
+        else:
+            self.marked=True
 
 class Board:
 
     def __init__(self,size,difficulty) -> None:
-        self.num_of_mines=(difficulty*size*size)/2
+        self.num_of_mines=(difficulty*size)*2
         self.size=size
         self.board=self.generate_board()
          
@@ -69,32 +78,47 @@ class Board:
         for row in range(self.size):
             board.append([])
             for col in range(self.size):
-                # if placed_mines < self.num_of_mines:
-                #     board[i].append(random.choice(["0","0","0","0","*"]))
-                # else:
-                #     board[i].append("0")
-                if placed_mines < self.num_of_mines:
-                    board[row].append(Field(row,col,self,random.choice(["0","0","0","0","*"])))
-                else:
-                    board[row].append(Field(row,col,self))
+                board[row].append(Field(row,col,self))
+
+        for row in board:
+            chosen=random.sample(row,int(self.num_of_mines/self.size))
+            for mine in chosen:
+                mine.value="*"
 
 
 
         return board
 
 
+    def check_win(self):
+        for row in self.board:
+            for field in row:
+                if field.value == "*" and field.marked==False:
+                    return False
+                if field.value != "*" and field.marked==True:
+                    return False
+                
+        return True
+
 
     def print_board(self):
         x=""
         for row in self.board:
             for col in row:
-                if col.hidden==True:
+                if col.marked==True:
+                    x+="M"
+                elif col.hidden==True:
                     x+="?"
                 else:
                     x+=col.value
             x+="\n"
         print(x)
 
+    def xd(self):
+        for row in self.board:
+            for field in row:
+                if field.value=="*":
+                    field.marked=True
 
 
     def __str__(self) -> str:
